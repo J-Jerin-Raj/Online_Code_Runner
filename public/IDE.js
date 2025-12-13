@@ -1,70 +1,66 @@
-// import Autocompwords from './AutoCmp.js';
+const loginBtn = document.getElementById('loginBtn');
+const registerBtn = document.getElementById('registerBtn');
+const loginForm = document.getElementById('loginForm');
+const output = document.getElementById('output');
 
-let theme="dark";
+// Login functionality
+loginBtn.addEventListener('click', () => {
+  const username = document.getElementById('username').value;
+  const password = document.getElementById('password').value;
 
-function seltheme(val){
-    if(val){
-        theme="light";
+  fetch('/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ username, password }),
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.message === "Logged in successfully") {
+      output.textContent = "Welcome, " + username;
+      loginForm.style.display = 'none';  // Hide login form after successful login
+    } else {
+      output.textContent = "Login failed!";
     }
-    else{
-        theme="dark";
-    }
-}
+  })
+  .catch(err => {
+    console.error(err);
+    output.textContent = "Error logging in!";
+  });
+});
 
-require(["vs/editor/editor.main"], function () {
-    const initialCode = "#include <stdio.h>\n\nint main(){\n\t\n}";
+// Register functionality
+registerBtn.addEventListener('click', () => {
+  const username = document.getElementById('username').value;
+  const password = document.getElementById('password').value;
 
-    // Load saved code from localStorage if available
-    const savedCode = localStorage.getItem("editorCode") || initialCode;
+  fetch('/register', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ username, password }),
+  })
+  .then(response => response.json())
+  .then(data => {
+    output.textContent = data.message;
+  })
+  .catch(err => {
+    console.error(err);
+    output.textContent = "Error registering!";
+  });
+});
 
-
-    const editor = monaco.editor.create(document.getElementById("editor"), {
-        value: savedCode,
-        language: "c",
-        theme: "vs-"+theme,
-        automaticLayout: true
-    });
-
-    const output = document.getElementById("output");
-    const runBtn = document.getElementById("runBtn");
-    const resetBtn = document.getElementById("resetBtn");
-
-    // Focus and set initial cursor
-    editor.focus();
-    editor.setPosition({ lineNumber: 4, column: 10 });
-
-    // Save code automatically on change
-    editor.onDidChangeModelContent(() => {
-        localStorage.setItem("editorCode", editor.getValue());
-    });
-
-    // Reset button event handler
-    resetBtn.addEventListener('click', () => {
-        editor.setValue(initialCode);
-        editor.setPosition({ lineNumber: 4, column: 5 });
-        editor.focus();
-        localStorage.setItem("editorCode", initialCode);
-    });
-
-    // Run button (send code to backend)
-    runBtn.onclick = () => {
-        const code = editor.getValue();
-        output.textContent = "Compiling...";
-        fetch("/run", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ code })
-        })
-            .then(res => res.text())
-            .then(out => output.textContent = out);
-    };
-
-    // ----- Lightweight autocomplete for C -----
-    // monaco.languages.registerCompletionItemProvider('c', {
-    //     provideCompletionItems: function (model, position) {
-    //         return {
-    //             suggestions: 
-    //         };
-    //     }
-    // });
+// Log out functionality
+const logoutBtn = document.getElementById('logoutBtn'); // Assume there's a logout button
+logoutBtn.addEventListener('click', () => {
+  fetch('/logout', {
+    method: 'POST',
+  })
+  .then(response => response.json())
+  .then(data => {
+    output.textContent = data.message;
+    loginForm.style.display = 'block'; // Show login form on logout
+  })
+  .catch(err => {
+    console.error(err);
+    output.textContent = "Error logging out!";
+  });
 });

@@ -96,11 +96,11 @@
         .Btn.secondary:hover {
             background: #45494f;
         }
+
         .Btn.secondary:active {
             background: #3a3d41;
         }
 
-        /* Small label before dropdowns etc. */
         .label {
             font-size: 13px;
             color: #b7b7b7;
@@ -122,7 +122,7 @@
             border-color: #0e639c;
         }
 
-        /* Main app layout */
+        /* Main layout */
         #main {
             display: flex;
             height: calc(100vh - 56px);
@@ -131,7 +131,6 @@
             gap: 12px;
         }
 
-        /* Big card-like container */
         .panel {
             background: #1e1e1e;
             border-radius: 10px;
@@ -156,7 +155,6 @@
             background: #151515;
         }
 
-        /* Panel headers */
         .panelHeader {
             padding: 8px 12px;
             background: linear-gradient(180deg, #252526, #1e1e1e);
@@ -182,12 +180,11 @@
             background: #0e639c;
         }
 
-        /* Output area */
         #output {
             flex: 1;
             padding: 10px 12px;
             background: #000;
-            color: #e5e5e5;
+            color: #00ff1a;
             overflow-y: auto;
             font-family: "Consolas", monospace;
             font-size: 14px;
@@ -215,7 +212,6 @@
             background: #5a5a5a;
         }
 
-        /* Responsive tweak for smaller widths */
         @media (max-width: 900px) {
             #main {
                 flex-direction: column;
@@ -226,6 +222,46 @@
                 flex: unset;
                 height: 50%;
             }
+        }
+
+        /* Auth Form Styling */
+        .auth-form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 20px;
+            border-radius: 8px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 20;
+        }
+
+        .auth-form input {
+            margin: 10px;
+            padding: 8px;
+            border-radius: 6px;
+            border: 1px solid #333;
+            width: 250px;
+            background-color: #2d2d30;
+            color: #eaeaea;
+        }
+
+        .auth-form button {
+            margin: 10px;
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #0e639c, #1177bb);
+            border: none;
+            border-radius: 6px;
+            color: white;
+            cursor: pointer;
+        }
+
+        .auth-form button:hover {
+            opacity: 0.85;
         }
     </style>
 </head>
@@ -241,14 +277,13 @@
 
         <div id="toolbarControls">
             <span class="label">Language:</span>
-            <!-- You can hook this up in IDE.js if you want -->
             <select id="languageSelect">
                 <option value="cpp">C / C++</option>
                 <option value="java">Java</option>
                 <option value="python">Python</option>
                 <option value="javascript">JavaScript</option>
             </select>
-            <button id="themeBtn" class="Btn secondary">
+            <button id="themeBtn" class="Btn secondary" onclick="stheme()">
                 <span>🌓</span>
                 <span>Theme</span>
             </button>
@@ -262,6 +297,8 @@
                 <span>↻</span>
                 <span>Reset</span>
             </button>
+
+            <button id="logoutBtn" class="Btn secondary">Logout</button> <!-- Logout button -->
         </div>
     </div>
 
@@ -292,6 +329,14 @@
         </div>
     </div>
 
+    <!-- Authentication Form -->
+    <div id="loginForm" class="auth-form">
+        <input type="text" id="username" placeholder="Username" />
+        <input type="password" id="password" placeholder="Password" />
+        <button id="loginBtn">Login</button>
+        <button id="registerBtn">Register</button>
+    </div>
+
     <!-- Monaco loader + your logic -->
     <script>
         var require = { paths: { vs: "https://unpkg.com/monaco-editor@0.34.0/min/vs" } };
@@ -301,32 +346,19 @@
         let isDark = true; // Start in dark mode
     </script>
     <script>
-        brandtitle.addEventListener('click', () => {
-            window.location.reload();
-        });
-    </script>
-    <script>
-        themeBtn.addEventListener('click', () => {
-            isDark = !isDark;
-            if (isDark) {
-                seltheme(0);
-                document.body.style.background = '#1e1e1e';
-                document.getElementById('toolbar').style.background = '#2d2d30';
-                document.getElementById('outputContainer').style.background = '#1b1b1b';
-                document.getElementById('outputTitle').style.background = '#252526';
-                document.getElementById('output').style.background = '#000';
-                document.getElementById('output').style.color = '#fff';
-
-            } else {
-                seltheme(1);    
-                document.body.style.background = '#ffffff';
-                document.getElementById('toolbar').style.background = '#1f1f23';
-                document.getElementById('outputContainer').style.background = '#f9f9f9';
-                document.getElementById('outputTitle').style.background = '#e1e1e1';
-                document.getElementById('output').style.background = '#ffffff';
-                document.getElementById('output').style.color = '#000';
-
-            }
+        // Add event listener for logout button
+        const logoutBtn = document.getElementById('logoutBtn');
+        logoutBtn.addEventListener('click', () => {
+            fetch('/logout', {
+                method: 'POST'
+            })
+                .then(res => res.json())
+                .then(data => {
+                    alert(data.message);
+                    document.getElementById('loginForm').style.display = 'block'; // Show login form after logout
+                    document.getElementById('output').textContent = ''; // Clear the output area
+                })
+                .catch(err => alert('Error logging out.'));
         });
     </script>
 
@@ -334,6 +366,51 @@
     <script src="https://unpkg.com/monaco-editor@0.34.0/min/vs/editor/editor.main.nls.js"></script>
     <script src="https://unpkg.com/monaco-editor@0.34.0/min/vs/editor/editor.main.js"></script>
     <script src="IDE.js"></script>
+    <script>
+const loginForm = document.getElementById("loginForm");
+
+document.getElementById("loginBtn").onclick = async () => {
+  const username = document.getElementById("username").value;
+  const password = document.getElementById("password").value;
+
+  const res = await fetch("/login", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ username, password })
+  });
+
+  if (res.ok) {
+    loginForm.style.display = "none";
+  } else {
+    alert("Login failed");
+  }
+};
+
+document.getElementById("registerBtn").onclick = async () => {
+  const username = document.getElementById("username").value;
+  const password = document.getElementById("password").value;
+
+  const res = await fetch("/register", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ username, password })
+  });
+
+  alert("Registered. Now login.");
+};
+</script>
+<script>
+fetch("/auth-check")
+  .then(res => res.json())
+  .then(data => {
+    if (!data.authenticated) {
+      document.getElementById("loginForm").style.display = "flex";
+    } else {
+      document.getElementById("loginForm").style.display = "none";
+    }
+  });
+</script>
+
 
 </body>
 
