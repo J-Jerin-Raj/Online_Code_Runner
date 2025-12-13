@@ -1,5 +1,3 @@
-server.js
-
 const express = require("express");
 const { exec } = require("child_process");
 const fs = require("fs");
@@ -11,7 +9,7 @@ const connectDB = require("./db");
 const app = express();
 
 
-connectDB();
+// connectDB();
 
 app.use(express.json());
 app.use(express.static("public"));
