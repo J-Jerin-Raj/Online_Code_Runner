@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>ISwiftCoder | Register</title>
+  <link rel="stylesheet" href="auth.css">
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+</head>
+<body>
+
+<div class="auth-box">
+  <h1>ISWIFTCODER</h1>
+  <div class="subtitle">Create your account</div>
+
+  <label>Email</label>
+  <div class="email-group">
+    <input id="emailUser" placeholder="username">
+    <select id="emailDomain">
+      <option>@karunya.edu.in</option>
+      <option>@karunya.edu</option>
+      <option>@gmail.com</option>
+    </select>
+  </div>
+
+  <label>Password</label>
+  <input type="password" id="password" placeholder="Create password">
+
+  <div id="otpSection" style="display:none;">
+    <label>OTP</label>
+    <input id="otpInput" placeholder="Enter 6-digit OTP" maxlength="6">
+  </div>
+
+  <button id="registerBtn">Register</button>
+
+  <div class="link">
+    Already registered? <a href="login.html">Login</a>
+  </div>
+</div>
+
+<script src="register.js"></script>
+</body>
+</html>

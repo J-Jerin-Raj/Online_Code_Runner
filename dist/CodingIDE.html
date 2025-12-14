@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>iSwiftCoder</title>
+    <link rel="icon" href="logo.png">
+
+    <!-- Monaco Editor -->
+    <link rel="stylesheet" data-name="vs/editor/editor.main"
+        href="https://unpkg.com/monaco-editor@0.34.0/min/vs/editor/editor.main.css" />
+
+    <style>
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            background: #1e1e1e;
+            font-family: "Segoe UI", sans-serif;
+            color: #f3f3f3;
+            overflow: hidden;
+        }
+
+        /* Toolbar */
+        #toolbar {
+            height: 56px;
+            background: #1f1f23;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 18px;
+            border-bottom: 1px solid #3c3c3c;
+        }
+
+        #brand {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        #brandLogo {
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            background: url("logo.png") center/cover no-repeat;
+        }
+
+        .Btn {
+            background: linear-gradient(135deg, #0e639c, #1177bb);
+            border: none;
+            padding: 8px 18px;
+            border-radius: 999px;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            gap: 6px;
+            align-items: center;
+        }
+
+        .Btn.secondary { background: #3a3d41; }
+
+        select {
+            background: #2d2d30;
+            padding: 6px 10px;
+            color: #fff;
+            border-radius: 6px;
+            border: none;
+        }
+
+        /* Layout */
+        #main {
+            display: flex;
+            height: calc(100vh - 56px);
+            gap: 8px;
+            padding: 8px;
+        }
+
+        .panel {
+            background: #1e1e1e;
+            border-radius: 10px;
+            border: 1px solid #333;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .panelHeader {
+            background: #252526;
+            padding: 8px 12px;
+            border-bottom: 1px solid #3c3c3c;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        #editor { flex: 1; }
+
+        /* Right column */
+        #rightColumn {
+            flex: 0.7;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        /* Collaborators */
+        #collabList {
+            padding: 10px;
+        }
+
+        #addBtn {
+            background: #0e639c;
+            padding: 4px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            display: inline-block;
+            margin-bottom: 6px;
+        }
+
+        /* Test cases */
+        #testPanel {
+            display: none;
+        }
+
+        .testCase {
+            padding: 8px;
+            margin-bottom: 8px;
+            background: #000;
+            border-radius: 6px;
+        }
+
+        .testCase input {
+            width: 100%;
+            padding: 6px;
+            margin-top: 5px;
+            border-radius: 6px;
+            border: none;
+            outline: none;
+        }
+
+        /* Modal */
+        #modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #modalBox {
+            background: #252526;
+            padding: 20px;
+            width: 280px;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        #modalBox input {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border-radius: 6px;
+            border: none;
+        }
+    </style>
+</head>
+
+<body>
+
+<div id="toolbar">
+    <div id="brand">
+        <div id="brandLogo"></div>
+        <strong>iSwiftCoder</strong>
+    </div>
+
+    <div style="display:flex;gap:10px;">
+        <select>
+            <option>C/C++</option>
+            <option>Java</option>
+            <option>Python</option>
+        </select>
+        <button id="themeBtn" class="Btn secondary">🌓 Theme</button>
+        <button id="runBtn" class="Btn">▶ Run</button>
+    </div>
+</div>
+
+<div id="main">
+
+    <!-- Editor -->
+    <div class="panel" style="flex:2;">
+        <div class="panelHeader">Editor</div>
+        <div id="editor"></div>
+    </div>
+
+    <!-- Right column -->
+    <div id="rightColumn">
+
+        <!-- Collaborators -->
+        <div class="panel">
+            <div class="panelHeader">Collaborators</div>
+            <div id="collabList">
+                <div id="addBtn">+ Add</div>
+                <ul id="collabUL">
+                    <!-- Collaborator names will be added here -->
+                </ul>
+            </div>
+        </div>
+
+        <!-- Test Cases -->
+        <div id="testPanel" class="panel">
+            <div class="panelHeader">Test Cases</div>
+            <div style="padding:10px;">
+                <div class="testCase">
+                    <strong>Input</strong>
+                    <input placeholder="Enter input">
+                    <strong>Expected Output</strong>
+                    <input placeholder="Enter expected output">
+                </div>
+
+                <div class="testCase">
+                    <strong>Input</strong>
+                    <input placeholder="Enter input">
+                    <strong>Expected Output</strong>
+                    <input placeholder="Enter expected output">
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- Modal -->
+<div id="modal">
+    <div id="modalBox">
+        <h3>Add Collaborator</h3>
+        <input id="nameInput" placeholder="Name">
+        <button id="saveName" class="Btn" onclick="getcollab()">Save</button>
+    </div>
+</div>
+
+<script>
+    var require = { paths: { vs: "https://unpkg.com/monaco-editor@0.34.0/min/vs" } };
+</script>
+<script src="https://unpkg.com/monaco-editor@0.34.0/min/vs/loader.js"></script>
+
+<script>
+    let theme = "vs-dark";
+
+    brand.onclick = () => location.reload();
+
+    themeBtn.onclick = () => {
+        theme = theme === "vs-dark" ? "vs-light" : "vs-dark";
+        monaco.editor.setTheme(theme);
+    };
+
+    addBtn.onclick = () => modal.style.display = "flex";
+
+    saveName.onclick = () => {
+        if (nameInput.value.trim()) {
+            collabUL.innerHTML += <li>${nameInput.value}</li>;
+        }
+        modal.style.display = "none";
+    };
+
+    modal.onclick = e => e.target === modal && (modal.style.display = "none");
+
+    require(["vs/editor/editor.main"], () => {
+        monaco.editor.create(editor, {
+            value: "#include <stdio.h>\nint main(){\n\n}",
+            language: "c",
+            theme,
+            automaticLayout: true
+        });
+    });
+
+    // Show test cases ONLY after Run
+    runBtn.onclick = () => {
+        document.getElementById("testPanel").style.display = "flex";
+    };
+    function getcollab(){
+        const name = document.getElementById("nameInput").value;
+        if(name){
+            const li = document.createElement("li");
+            li.textContent = name;
+            document.getElementById("collabUL").appendChild(li);
+            document.getElementById("nameInput").value = "";
+        }
+    }
+</script>
+
+</body>
+</html>
