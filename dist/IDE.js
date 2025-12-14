@@ -1,66 +1,39 @@
-const loginBtn = document.getElementById('loginBtn');
-const registerBtn = document.getElementById('registerBtn');
-const loginForm = document.getElementById('loginForm');
-const output = document.getElementById('output');
-
-// Login functionality
-loginBtn.addEventListener('click', () => {
-  const username = document.getElementById('username').value;
-  const password = document.getElementById('password').value;
-
-  fetch('/login', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ username, password }),
-  })
-  .then(response => response.json())
-  .then(data => {
-    if (data.message === "Logged in successfully") {
-      output.textContent = "Welcome, " + username;
-      loginForm.style.display = 'none';  // Hide login form after successful login
-    } else {
-      output.textContent = "Login failed!";
-    }
-  })
-  .catch(err => {
-    console.error(err);
-    output.textContent = "Error logging in!";
-  });
-});
-
-// Register functionality
-registerBtn.addEventListener('click', () => {
-  const username = document.getElementById('username').value;
-  const password = document.getElementById('password').value;
-
-  fetch('/register', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ username, password }),
-  })
-  .then(response => response.json())
-  .then(data => {
-    output.textContent = data.message;
-  })
-  .catch(err => {
-    console.error(err);
-    output.textContent = "Error registering!";
-  });
-});
-
-// Log out functionality
-const logoutBtn = document.getElementById('logoutBtn'); // Assume there's a logout button
-logoutBtn.addEventListener('click', () => {
-  fetch('/logout', {
-    method: 'POST',
-  })
-  .then(response => response.json())
-  .then(data => {
-    output.textContent = data.message;
-    loginForm.style.display = 'block'; // Show login form on logout
-  })
-  .catch(err => {
-    console.error(err);
-    output.textContent = "Error logging out!";
-  });
+"use strict";
+// IDE.ts – Monaco editor setup (no npm, loaded from CDN)
+require(['vs/editor/editor.main'], (monacoModule) => {
+    monaco = monacoModule;
+    const editorEl = document.getElementById('editor');
+    const outputEl = document.getElementById('output');
+    const runBtn = document.getElementById('runBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const initialCode = `#include <stdio.h>\n\nint main(){\n\t\n}`;
+    const savedCode = localStorage.getItem('editorCode') || initialCode;
+    const editor = monaco.editor.create(editorEl, {
+        value: savedCode,
+        language: 'c',
+        theme: 'vs-dark',
+        automaticLayout: true,
+    });
+    editor.focus();
+    editor.setPosition({ lineNumber: 4, column: 5 });
+    editor.onDidChangeModelContent(() => {
+        localStorage.setItem('editorCode', editor.getValue());
+    });
+    resetBtn.addEventListener('click', () => {
+        editor.setValue(initialCode);
+        editor.setPosition({ lineNumber: 4, column: 5 });
+        editor.focus();
+        localStorage.setItem('editorCode', initialCode);
+    });
+    runBtn.addEventListener('click', () => {
+        const code = editor.getValue();
+        outputEl.textContent = 'Compiling...';
+        fetch('/run', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ code }),
+        })
+            .then(res => res.text())
+            .then(out => (outputEl.textContent = out));
+    });
 });
