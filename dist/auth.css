@@ -1,0 +1,114 @@
+* {
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
+
+body {
+  margin: 0;
+  height: 100vh;
+  background: radial-gradient(circle at top, rgb(30, 30, 30), rgb(15, 15, 15));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgb(255, 255, 255);
+}
+
+.auth-box {
+  width: 380px;
+  padding: 32px;
+  background: rgba(30, 30, 30, 0.92);
+  border-radius: 18px;
+  box-shadow: 0 0 40px rgba(0,0,0,0.8);
+}
+
+h1 {
+  text-align: center;
+  color: rgb(14, 99, 156);
+  letter-spacing: 3px;
+  margin-bottom: 6px;
+}
+
+.subtitle {
+  text-align: center;
+  font-size: 13px;
+  opacity: 0.8;
+  margin-bottom: 24px;
+}
+
+label {
+  font-size: 13px;
+  margin-top: 12px;
+  display: block;
+}
+
+.email-group {
+  display: flex;
+}
+
+.email-group input,
+.email-group select,
+input {
+  height: 44px;
+  border-radius: 10px;
+  border: 1px solid rgba(180,210,255,0.4);
+  background: linear-gradient(145deg,#020b24,#000814);
+  color: rgb(233, 243, 255);
+  padding: 0 14px;
+}
+
+.email-group input {
+  flex: 1;
+  border-radius: 10px 0 0 10px;
+  border-right: none;
+}
+
+.email-group select {
+  width: 150px;
+  border-radius: 0 10px 10px 0;
+}
+
+input {
+  width: 100%;
+}
+
+input::placeholder {
+  color: rgba(200,200,200,0.5);
+}
+
+button {
+  width: 100%;
+  height: 46px;
+  border-radius: 999px;
+  border: none;
+  background: rgb(14, 99, 156);
+  color: rgb(255, 255, 255);
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 18px;
+}
+
+button:hover {
+  opacity: 0.9;
+}
+
+.session-box {
+  margin-top: 14px;
+  background: rgba(255,255,255,0.05);
+  padding: 14px;
+  border-radius: 12px;
+  text-align: center;
+  font-size: 13px;
+}
+
+.link {
+  text-align: center;
+  margin-top: 14px;
+  font-size: 12px;
+}
+
+.link a {
+  color: rgb(14, 99, 156);
+  text-decoration: none;
+}option{
+    background-color: #020b24;
+}

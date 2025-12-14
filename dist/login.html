@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>ISwiftCoder | Login</title>
+  <link rel="stylesheet" href="auth.css">
+</head>
+<body>
+
+<div class="auth-box">
+  <h1>ISWIFTCODER</h1>
+  <div class="subtitle">Compile at the speed of thought</div>
+
+  <label>Email</label>
+  <div class="email-group">
+    <input id="emailUser" placeholder="username">
+    <select id="emailDomain">
+      <option>@karunya.edu.in</option>
+      <option>@karunya.edu</option>
+      <option>@gmail.com</option>
+    </select>
+  </div>
+
+  <label>Password</label>
+  <input type="password" id="password" placeholder="Enter password">
+
+  <label>Session ID</label>
+  <input id="sessionInput" placeholder="Enter session ID">
+
+  <div class="session-box">
+    Or create one:
+    <div id="newSession">----</div>
+    <button id="createSession">Create Session</button>
+  </div>
+
+  <button id="loginBtn">Login</button>
+
+  <div class="link">
+    First time? <a href="register.html">Register</a>
+  </div>
+</div>
+
+<script src="login.js"></script>
+</body>
+</html>
