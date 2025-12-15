@@ -1,46 +1,354 @@
-<!--
-Source - https://stackoverflow.com/a
-Posted by tao, modified by community. See post 'Timeline' for change history
-Retrieved 2025-11-23, License - CC BY-SA 4.0
--->
-
 <!DOCTYPE html>
-<html>
-  <head>
-    <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
-    <link
-      rel="stylesheet"
-      data-name="vs/editor/editor.main"
-      href="https://unpkg.com/monaco-editor@0.34.0/min/vs/editor/editor.main.css"
-    />
-  </head>
-<script>  window.location.replace("CodingIDE1.html");
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>iSwiftCoder</title>
+    <link rel="icon" href="logo.png">
+
+    <!-- Monaco Editor -->
+    <link rel="stylesheet"
+          href="https://unpkg.com/monaco-editor@0.34.0/min/vs/editor/editor.main.css"/>
+
+    <style>
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            background: #1e1e1e;
+            font-family: "Segoe UI", sans-serif;
+            color: #f3f3f3;
+            overflow: hidden;
+        }
+
+        /* Toolbar */
+        #toolbar {
+            height: 56px;
+            background: #1f1f23;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 18px;
+            border-bottom: 1px solid #3c3c3c;
+        }
+
+        #brand {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        #brandLogo {
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            background: url("logo.png") center/cover no-repeat;
+        }
+
+        .Btn {
+            background: linear-gradient(135deg, #0e639c, #1177bb);
+            border: none;
+            padding: 8px 18px;
+            border-radius: 999px;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            gap: 6px;
+            align-items: center;
+            font-size: 14px;
+        }
+
+        .Btn.secondary { background: #3a3d41; }
+
+        select {
+            background: #2d2d30;
+            padding: 6px 10px;
+            color: #fff;
+            border-radius: 6px;
+            border: none;
+        }
+
+        /* Layout */
+        #main {
+            display: flex;
+            height: calc(100vh - 56px);
+            gap: 8px;
+            padding: 8px;
+        }
+
+        .panel {
+            background: #1e1e1e;
+            border-radius: 10px;
+            border: 1px solid #333;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .panelHeader {
+            background: #252526;
+            padding: 8px 12px;
+            border-bottom: 1px solid #3c3c3c;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        #editor { flex: 1; }
+
+        /* Right column */
+        #rightColumn {
+            flex: 0.8;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        /* Collaborators */
+        #collabList {
+            padding: 10px;
+            font-size: 14px;
+        }
+
+        #addBtn {
+            background: #0e639c;
+            padding: 4px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            display: inline-block;
+            margin-bottom: 6px;
+        }
+
+        #collabUL {
+            padding-left: 18px;
+            margin: 0;
+        }
+
+        /* Output */
+        #outputPanel {
+            display: none;
+            flex: 1;
+        }
+
+        #output {
+            flex: 1;
+            padding: 10px;
+            background: #000;
+            color: #e5e5e5;
+            font-family: Consolas, monospace;
+            font-size: 14px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+
+        /* Modal */
+        #modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,.55);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        #modalBox {
+            background: #252526;
+            padding: 20px;
+            width: 300px;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        #modalBox h3 {
+            margin-top: 0;
+        }
+
+        #modalBox input {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 12px;
+            border-radius: 6px;
+            border: none;
+            outline: none;
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- Toolbar -->
+<div id="toolbar">
+    <div id="brand">
+        <div id="brandLogo"></div>
+        <strong>iSwiftCoder</strong>
+    </div>
+
+    <div style="display:flex;gap:10px;">
+        <select>
+            <option>C/C++</option>
+            <option>Java</option>
+            <option>Python</option>
+        </select>
+        <button id="themeBtn" class="Btn secondary">🌓 Theme</button>
+        <button id="runBtn" class="Btn">▶ Run</button>
+    </div>
+</div>
+
+<!-- Main -->
+<div id="main">
+
+    <!-- Editor -->
+    <div class="panel" style="flex:2;">
+        <div class="panelHeader">Editor</div>
+        <div id="editor"></div>
+    </div>
+
+    <!-- Right column -->
+    <div id="rightColumn">
+
+        <!-- Collaborators -->
+        <div class="panel">
+            <div class="panelHeader">Collaborators</div>
+            <div id="collabList">
+                <div id="addBtn">+ Invite</div>
+                <ul id="collabUL"></ul>
+            </div>
+        </div>
+
+        <!-- Output -->
+        <div id="outputPanel" class="panel">
+            <div class="panelHeader">Output</div>
+            <pre id="output"></pre>
+        </div>
+
+    </div>
+</div>
+
+<!-- Invite Modal -->
+<div id="modal">
+    <div id="modalBox">
+        <h3>Invite Collaborator</h3>
+        <input type="name" id="name" placeholder="Full Name">
+        <input type="email" id="emailInput" placeholder="Email address">
+        <button class="Btn" id="inviteBtn">Send Invite</button>
+    </div>
+</div>
+
+<!-- Monaco Loader -->
+<script>
+    var require = { paths: { vs: "https://unpkg.com/monaco-editor@0.34.0/min/vs" } };
 </script>
-  <body style="margin: 0;">
-    <div
-      id="container"
-      style="width: 800px; height: 600px; border: 1px solid grey"
-    ></div>
+<script src="https://unpkg.com/monaco-editor@0.34.0/min/vs/loader.js"></script>
 
-    <script>
-      var require = {
-        paths: {
-          vs: "https://unpkg.com/monaco-editor@0.34.0/min/vs",
-        },
-      };
-    </script>
-    <script src="https://unpkg.com/monaco-editor@0.34.0/min/vs/loader.js"></script>
-    <script src="https://unpkg.com/monaco-editor@0.34.0/min/vs/editor/editor.main.nls.js"></script>
-    <script src="https://unpkg.com/monaco-editor@0.34.0/min/vs/editor/editor.main.js"></script>
-  </body>
+<script>
+    let theme = "vs-dark";
+    let editorInstance;
+
+    const modal = document.getElementById("modal");
+    const collabUL = document.getElementById("collabUL");
+    const outputPanel = document.getElementById("outputPanel");
+    const outputBox = document.getElementById("output");
+
+    // Reload on logo click
+    document.getElementById("brand").onclick = () => location.reload();
+
+    // Theme toggle
+    document.getElementById("themeBtn").onclick = () => {
+        theme = theme === "vs-dark" ? "vs-light" : "vs-dark";
+        monaco.editor.setTheme(theme);
+    };
+
+    // Open modal
+    document.getElementById("addBtn").onclick = () => {
+        modal.style.display = "flex";
+        document.getElementById("emailInput").focus();
+    };
+
+    // Close modal on backdrop click
+    modal.onclick = e => {
+        if (e.target === modal) modal.style.display = "none";
+    };
+
+    // Monaco init
+    require(["vs/editor/editor.main"], () => {
+        editorInstance = monaco.editor.create(document.getElementById("editor"), {
+            value:
+`#include <stdio.h>
+
+int main() {
+    // write your code here
+
+    return 0;
+}`,
+            language: "c",
+            theme,
+            automaticLayout: true
+        });
+    });
+
+    // Run code
+    document.getElementById("runBtn").onclick = async () => {
+        outputPanel.style.display = "flex";
+        outputBox.textContent = "Compiling...";
+
+        try {
+            const res = await fetch("/run", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    language: "c",
+                    code: editorInstance.getValue()
+                })
+            });
+
+            const text = await res.text();
+            outputBox.textContent = text;
+
+        } catch {
+            outputBox.textContent = "❌ Could not connect to compiler server.";
+        }
+    };
+
+    // Invite collaborator
+    document.getElementById("inviteBtn").onclick = async () => {
+    const name = document.getElementById("name").value.trim();
+    const email = document.getElementById("emailInput").value.trim();
+
+    if (!name || !email) {
+        alert("Please enter both name and email");
+        return;
+    }
+
+    try {
+        const res = await fetch("/invite", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ name, email })
+        });
+
+        const msg = await res.text();
+
+        if (res.ok) {
+            // ✅ SHOW ONLY NAME IN UI
+            const li = document.createElement("li");
+            li.textContent = name;
+            collabUL.appendChild(li);
+
+            // Reset modal
+            document.getElementById("name").value = "";
+            document.getElementById("emailInput").value = "";
+            modal.style.display = "none";
+        }
+
+        alert(msg);
+
+    } catch {
+        alert("Failed to send invitation.");
+    }
+};
+
+</script>
+
+</body> 
 </html>
-
-<script>// Source - https://stackoverflow.com/a
-// Posted by tao, modified by community. See post 'Timeline' for change history
-// Retrieved 2025-11-23, License - CC BY-SA 4.0
-
-var editor = monaco.editor.create(document.getElementById("container"), {
-  value: ["function x() {", '\tconsole.log("Hello world!");', "}"].join("\n"),
-  language: "javascript",
-});
-monaco.editor.setTheme("vs-dark");</script>
