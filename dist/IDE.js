@@ -1,66 +1,24 @@
-const loginBtn = document.getElementById('loginBtn');
-const registerBtn = document.getElementById('registerBtn');
-const loginForm = document.getElementById('loginForm');
-const output = document.getElementById('output');
-
-// Login functionality
-loginBtn.addEventListener('click', () => {
-  const username = document.getElementById('username').value;
-  const password = document.getElementById('password').value;
-
-  fetch('/login', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ username, password }),
-  })
-  .then(response => response.json())
-  .then(data => {
-    if (data.message === "Logged in successfully") {
-      output.textContent = "Welcome, " + username;
-      loginForm.style.display = 'none';  // Hide login form after successful login
-    } else {
-      output.textContent = "Login failed!";
-    }
-  })
-  .catch(err => {
-    console.error(err);
-    output.textContent = "Error logging in!";
-  });
+"use strict";
+let editor;
+require(['vs/editor/editor.main'], () => {
+    editor = monaco.editor.create(document.getElementById('editor'), {
+        value: '#include <stdio.h>\n\nint main() {\n    printf("Hello, World!");\n    return 0;\n}',
+        language: 'c',
+        theme: 'vs-dark',
+        automaticLayout: true
+    });
 });
-
-// Register functionality
-registerBtn.addEventListener('click', () => {
-  const username = document.getElementById('username').value;
-  const password = document.getElementById('password').value;
-
-  fetch('/register', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ username, password }),
-  })
-  .then(response => response.json())
-  .then(data => {
-    output.textContent = data.message;
-  })
-  .catch(err => {
-    console.error(err);
-    output.textContent = "Error registering!";
-  });
-});
-
-// Log out functionality
-const logoutBtn = document.getElementById('logoutBtn'); // Assume there's a logout button
-logoutBtn.addEventListener('click', () => {
-  fetch('/logout', {
-    method: 'POST',
-  })
-  .then(response => response.json())
-  .then(data => {
-    output.textContent = data.message;
-    loginForm.style.display = 'block'; // Show login form on logout
-  })
-  .catch(err => {
-    console.error(err);
-    output.textContent = "Error logging out!";
-  });
+document.getElementById('runBtn').addEventListener('click', async () => {
+    const code = editor.getValue();
+    const language = document.getElementById('languageSelect').value;
+    const output = document.getElementById('output');
+    const status = document.getElementById('runStatus');
+    status.textContent = 'Running...';
+    const res = await fetch('/run', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code, language })
+    });
+    output.textContent = await res.text();
+    status.textContent = 'Finished';
 });
