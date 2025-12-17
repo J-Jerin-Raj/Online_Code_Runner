@@ -1,0 +1,46 @@
+<!--
+Source - https://stackoverflow.com/a
+Posted by tao, modified by community. See post 'Timeline' for change history
+Retrieved 2025-11-23, License - CC BY-SA 4.0
+-->
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+    <link
+      rel="stylesheet"
+      data-name="vs/editor/editor.main"
+      href="https://unpkg.com/monaco-editor@0.34.0/min/vs/editor/editor.main.css"
+    />
+  </head>
+<script>  window.location.replace("CodingIDE1.html");
+</script>
+  <body style="margin: 0;">
+    <div
+      id="container"
+      style="width: 800px; height: 600px; border: 1px solid grey"
+    ></div>
+
+    <script>
+      var require = {
+        paths: {
+          vs: "https://unpkg.com/monaco-editor@0.34.0/min/vs",
+        },
+      };
+    </script>
+    <script src="https://unpkg.com/monaco-editor@0.34.0/min/vs/loader.js"></script>
+    <script src="https://unpkg.com/monaco-editor@0.34.0/min/vs/editor/editor.main.nls.js"></script>
+    <script src="https://unpkg.com/monaco-editor@0.34.0/min/vs/editor/editor.main.js"></script>
+  </body>
+</html>
+
+<script>// Source - https://stackoverflow.com/a
+// Posted by tao, modified by community. See post 'Timeline' for change history
+// Retrieved 2025-11-23, License - CC BY-SA 4.0
+
+var editor = monaco.editor.create(document.getElementById("container"), {
+  value: ["function x() {", '\tconsole.log("Hello world!");', "}"].join("\n"),
+  language: "javascript",
+});
+monaco.editor.setTheme("vs-dark");</script>

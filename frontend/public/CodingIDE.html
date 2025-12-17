@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>iSwiftCoder</title>
+    <link rel="icon" href="logo.png">
+
+    <!-- Monaco Editor CSS -->
+    <link rel="stylesheet" data-name="vs/editor/editor.main"
+        href="https://unpkg.com/monaco-editor@0.34.0/min/vs/editor/editor.main.css" />
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: radial-gradient(circle at top left, #252526, #1e1e1e 40%, #111 100%);
+            font-family: "Segoe UI", sans-serif;
+            color: #f3f3f3;
+            overflow: hidden;
+        }
+
+        /* Top app bar */
+        #toolbar {
+            width: 100%;
+            height: 56px;
+            background: #1f1f23;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 18px;
+            border-bottom: 1px solid #3c3c3c;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+            position: relative;
+            z-index: 10;
+        }
+
+        #brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        #brandLogo {
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            background: url("logo.png") center/cover no-repeat, linear-gradient(135deg, #0e639c, #3a96dd);
+        }
+
+        #brandTitle {
+            font-size: 18px;
+            letter-spacing: 0.03em;
+            font-weight: 600;
+            color: #ffffff;
+        }
+
+        #toolbarControls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .Btn {
+            background: linear-gradient(135deg, #0e639c, #1177bb);
+            border: none;
+            padding: 8px 18px;
+            border-radius: 999px;
+            font-size: 14px;
+            color: white;
+            cursor: pointer;
+            transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease, opacity 0.15s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        .Btn:active {
+            transform: scale(0.97);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+        }
+
+        .Btn:hover {
+            opacity: 0.95;
+        }
+
+        .Btn.secondary {
+            background: #3a3d41;
+            box-shadow: none;
+        }
+
+        .Btn.secondary:hover {
+            background: #45494f;
+        }
+
+        /* Small label before dropdowns etc. */
+        .label {
+            font-size: 13px;
+            color: #b7b7b7;
+            margin-right: 4px;
+        }
+
+        select {
+            background: #2d2d30;
+            border: 1px solid #3f3f46;
+            border-radius: 6px;
+            padding: 6px 10px;
+            color: #eaeaea;
+            font-size: 13px;
+            outline: none;
+            cursor: pointer;
+        }
+
+        select:focus {
+            border-color: #0e639c;
+        }
+
+        /* Main app layout */
+        #main {
+            display: flex;
+            height: calc(100vh - 56px);
+            width: 100%;
+            padding: 12px 12px 16px 12px;
+            gap: 12px;
+        }
+
+        /* Big card-like container */
+        .panel {
+            background: #1e1e1e;
+            border-radius: 10px;
+            border: 1px solid #333;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.45);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #editorPanel {
+            flex: 2;
+            min-width: 0;
+        }
+
+        #editor {
+            flex: 1;
+        }
+
+        #outputPanel {
+            flex: 1.1;
+            background: #151515;
+        }
+
+        /* Panel headers */
+        .panelHeader {
+            padding: 8px 12px;
+            background: linear-gradient(180deg, #252526, #1e1e1e);
+            border-bottom: 1px solid #3c3c3c;
+            font-size: 13px;
+            font-weight: 600;
+            color: #dcdcdc;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .panelHeader span {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .statusDot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #0e639c;
+        }
+
+        /* Output area */
+        #output {
+            flex: 1;
+            padding: 10px 12px;
+            background: #000;
+            color: #e5e5e5;
+            overflow-y: auto;
+            font-family: "Consolas", monospace;
+            font-size: 14px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #1e1e1e;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #454545;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #5a5a5a;
+        }
+
+        /* Responsive tweak for smaller widths */
+        @media (max-width: 900px) {
+            #main {
+                flex-direction: column;
+            }
+
+            #editorPanel,
+            #outputPanel {
+                flex: unset;
+                height: 50%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Toolbar -->
+    <div id="toolbar">
+        <div id="brand">
+            <div id="brandLogo"></div>
+            <div id="brandTitle">iSwiftCoder</div>
+        </div>
+
+        <div id="toolbarControls">
+            <span class="label">Language:</span>
+            <!-- You can hook this up in IDE.js if you want -->
+            <select id="languageSelect">
+                <option value="cpp">C / C++</option>
+                <option value="java">Java</option>
+                <option value="python">Python</option>
+                <option value="javascript">JavaScript</option>
+            </select>
+
+            <button id="runBtn" class="Btn">
+                <span>▶</span>
+                <span>Run</span>
+            </button>
+
+            <button id="resetBtn" class="Btn secondary">
+                <span>↻</span>
+                <span>Reset</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Main layout -->
+    <div id="main">
+        <!-- Editor panel -->
+        <div id="editorPanel" class="panel">
+            <div class="panelHeader">
+                <span>
+                    <span class="statusDot"></span>
+                    <span>Editor</span>
+                </span>
+                <span id="fileNameLabel">main.cpp</span>
+            </div>
+            <div id="editor"></div>
+        </div>
+
+        <!-- Output panel -->
+        <div id="outputPanel" class="panel">
+            <div class="panelHeader">
+                <span>
+                    <span class="statusDot"></span>
+                    <span>Output</span>
+                </span>
+                <span id="runStatus">Idle</span>
+            </div>
+            <pre id="output">Nothing</pre>
+        </div>
+    </div>
+
+    <!-- Monaco loader + your logic -->
+    <script>
+        var require = { paths: { vs: "https://unpkg.com/monaco-editor@0.34.0/min/vs" } };
+    </script>
+
+    <script src="https://unpkg.com/monaco-editor@0.34.0/min/vs/loader.js"></script>
+    <script src="https://unpkg.com/monaco-editor@0.34.0/min/vs/editor/editor.main.nls.js"></script>
+    <script src="https://unpkg.com/monaco-editor@0.34.0/min/vs/editor/editor.main.js"></script>
+    <script src="IDE.js"></script>
+
+</body>
+
+</html>
